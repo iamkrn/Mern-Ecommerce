@@ -1,8 +1,55 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const  { OAuth2Client } = require("google-auth-library");
 
-exports.registerUser = async (req, res) => {
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ message: "Credential is required" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const { email, name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        username: name,
+        email,
+        profileImage: picture,
+        password: null,
+        isGoogleUser: true
+        });
+    }
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      user,
+      token,
+    });
+
+  } catch (error) {
+    console.log("Google Error:", error);
+    res.status(500).json({ message: "Google login failed" });
+  }
+};exports.registerUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
         const profileImage = req.file ? req.file.filename : "default-profile.png";
@@ -72,6 +119,9 @@ exports.loginUser =async(req,res)=>{
         if(!isPasswordValid){
             return res.status(401).json({ message: "Invalid password" });
         }
+        if (!user.password) {
+  return res.status(400).json({ message: "Use Google login" });
+}
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
         console.log("JWT SECRET 👉", process.env.JWT_SECRET);
         res.status(200).json({ message: "User logged in successfully!", user, token });
@@ -79,3 +129,5 @@ exports.loginUser =async(req,res)=>{
         res.status(500).json({ message: error.message });
     }
 }
+
+

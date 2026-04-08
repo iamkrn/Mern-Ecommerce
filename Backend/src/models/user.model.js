@@ -13,12 +13,16 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true
     },
-    password: {
-        type: String,
-        required: true,
-        minlength: 8
-    },
-    profileImage: {
+    isGoogleUser: {
+  type: Boolean,
+  default: false
+},
+   password: {
+  type: String,
+  required: function () {
+    return !this.isGoogleUser;
+  }
+}, profileImage: {
         type: String,
         default: "default-profile.png"
     }

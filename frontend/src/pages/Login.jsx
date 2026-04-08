@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google"; 
+import axios from "axios";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,7 +12,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    // 🔐 Basic validation
+    // Basic validation
     if (!email || !password) {
       toast.error("All fields are required");
       return;
@@ -49,6 +51,31 @@ export default function Login() {
     }
   };
 
+  const handleGoogleSuccess = async(credentialResponse)=>{
+ try {
+
+  const res = await axios.post(
+  "http://localhost:5000/api/auth/google",
+  {
+    credential: credentialResponse.credential,
+  }
+);
+
+const data = res.data;
+
+console.log("BACKEND 👉", data);
+
+localStorage.setItem("token", data.token);
+localStorage.setItem("user", JSON.stringify(data.user));
+toast.success("Login successful 🎉");
+navigate("/");
+
+  
+ } catch (error) {
+  console.log(error);
+  toast.error("Google login failed");
+  
+ }}
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96">
@@ -82,6 +109,15 @@ export default function Login() {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+        <div className="mt-4 flex justify-center">
+  <GoogleLogin
+  
+    onSuccess={handleGoogleSuccess}
+    onError={() => {
+      toast.error("Google Login Failed");
+    }}
+  />
+</div>
 
         {/* EXTRA */}
         <p className="text-sm text-gray-500 text-center mt-4">
