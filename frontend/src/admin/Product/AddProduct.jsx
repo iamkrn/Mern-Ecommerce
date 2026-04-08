@@ -32,6 +32,7 @@ const AddProduct = () => {
         e.preventDefault();
 
         try {
+            const token = localStorage.getItem("token");
             const data = new FormData();
             data.append("name", formData.name);
             data.append("description", formData.description);
@@ -44,7 +45,9 @@ const AddProduct = () => {
                 data,
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data"
+                        "Content-Type": "multipart/form-data",
+                                  Authorization: `Bearer ${token}`
+
                     }
                 }
             );

@@ -86,6 +86,8 @@ function Cart() {
   // 💳 CHECKOUT
   const handleCheckout = async () => {
     try {
+          localStorage.setItem("pendingCart", JSON.stringify(cart));
+
       const res = await axios.post(
         "http://localhost:5000/api/payment/create-checkout-session",
         { products: cart }

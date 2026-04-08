@@ -9,6 +9,7 @@ const countDownRoutes = require("./routes/countDown.routes");
 const cartRoutes = require("./routes/cart.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const contactRoutes = require("./routes/contact.routes")
+const adminRoutes = require("./routes/admin.routes")
 
 const app = express();
 
@@ -42,5 +43,7 @@ app.use("/api", countDownRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/contact",contactRoutes)
+app.use("/api/admin",adminRoutes);
+app.use("/api/orders", require("./routes/order.routes"));
 
 module.exports = app;
