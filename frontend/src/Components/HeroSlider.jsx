@@ -34,6 +34,51 @@ const FEATURES = [
 const discount = (p, m) => Math.round(((m - p) / m) * 100);
 const fmt      = (n)    => "₹" + n.toLocaleString("en-IN");
 
+const addToCart = async (product) => {
+    const token = localStorage.getItem("token");
+
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+    existingCart.push(product);
+
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+
+    // 🔥 Navbar update
+    window.dispatchEvent(new Event("cartUpdated"));
+
+    if (!token) {
+      toast.error("Login first");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: product._id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 401) {
+        toast.error("Session expired, login again");
+        localStorage.removeItem("token");
+        navigate("/login");
+        return;
+      }
+
+      toast.success("Added to cart 🛒");
+    } catch (err) {
+      toast.error("Error adding to cart");
+    }
+  };
+
+
 /* ─── TOAST ─── */
 function Toast({ msg, onDone }) {
   useEffect(() => { const t = setTimeout(onDone, 2200); return () => clearTimeout(t); }, []);
@@ -85,6 +130,14 @@ function ProductCard({ product, onCart, onWishlist, wishlisted }) {
         >
           Quick Add to Bag
         </button>
+         <button
+                  onClick={() => addToCart(product)}
+                            className="absolute bottom-0 left-0 right-0 bg-stone-900 text-white text-xs tracking-widest uppercase py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 hover:bg-amber-600"
+
+                >
+                  Add to Cart
+                </button>
+              
       </div>
 
       {/* Info */}
