@@ -1,18 +1,25 @@
 const Blog = require("../models/blog.model");
 
+// Create a new blog
 exports.createBlog = async (req, res) => {
     try {
         const { title, description, date } = req.body;
+        if (!req.file) {
+        return res.status(400).json({ message: "Image is required" });
+        }
         const image = req.file.filename;
+
         const blog = new Blog({ title, description, image, date });
         await blog.save();
+
         res.status(201).json({ message: "Blog created!", blog });
-    } catch (error) {
+         } 
+    catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-
+// Get all blogs
 exports.getAllBlogs = async (req, res) => {
     try {
         const blogs = await Blog.find();
@@ -22,6 +29,7 @@ exports.getAllBlogs = async (req, res) => {
     }
 };
 
+// Get a single blog by ID
 exports.getBlogById = async (req, res) => {
     try {
         const blog = await Blog.findById(req.params.id);
@@ -34,6 +42,7 @@ exports.getBlogById = async (req, res) => {
     }
 };
 
+// Update a blog
 exports.updateBlog = async (req, res) => {
     try {
         const updates = req.body;
@@ -49,7 +58,7 @@ exports.updateBlog = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
+// Delete a blog
 exports.deleteBlog = async (req, res) => {
     try {
         const blog = await Blog.findByIdAndDelete(req.params.id);

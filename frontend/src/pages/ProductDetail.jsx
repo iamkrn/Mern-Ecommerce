@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const ProductDetail = () => {
           const token = localStorage.getItem("token");
   
           if (!token) {
-              toast.error("Login first 🔐");
+              toast.error("Login first ");
               navigate("/login");
               return;
           }
@@ -36,14 +37,14 @@ const ProductDetail = () => {
                   method: "POST",
                   headers: {
                       "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`, // ✅ MOST IMPORTANT
+                      Authorization: `Bearer ${token}`, 
                   },
                   body: JSON.stringify({ productId }),
               });
   
               const data = await res.json();
   
-              // 🔥 HANDLE ERROR PROPERLY
+              
               if (!res.ok) {
                   toast.error(data.message || "Failed to add");
                   return;
@@ -102,7 +103,7 @@ const ProductDetail = () => {
 
           {/* BUTTON */}
           <button
-                                                      onClick={() => addToCart(product._id)}
+             onClick={() => addToCart(product._id)}
 
             className="mt-6 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
           >

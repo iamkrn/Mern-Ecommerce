@@ -33,7 +33,6 @@ const AdminDashboard = () => {
 
     setTotalUsers(res.data.totalUsers);
 
-    // ✅ FIX FORMAT
     const formatted = res.data.monthlyGrowth.map(item => ({
       month: item.month,
       users: item.users
@@ -52,7 +51,7 @@ const AdminDashboard = () => {
 
       setSalesData(res.data || []);
 
-      // ✅ TOTAL REVENUE CALCULATE
+      //  TOTAL REVENUE CALCULATE
       const revenue = res.data.reduce((acc, curr) => acc + (curr.totalRevenue || 0), 0);
       setTotalRevenue(revenue);
 
@@ -105,7 +104,7 @@ const AdminDashboard = () => {
 
         <h2 className="text-3xl font-bold mb-6">Dashboard</h2>
 
-        {/* 🔥 CARDS */}
+        {/*  CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 
   <div className="bg-white p-5 rounded-xl shadow">
@@ -185,8 +184,8 @@ const AdminDashboard = () => {
 
               {/* USER */}
               <td className="p-3 font-medium">
-    <td>{order.user?.name || order.user?.email || "Guest"}</td>
-              </td>
+              {order.user?.username || order.user?.name || order.user?.email || "Guest"}
+            </td>
 
               {/* PRICE */}
               <td className="p-3">

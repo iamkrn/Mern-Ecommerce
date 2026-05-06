@@ -37,7 +37,7 @@ export default function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    setUser(null); // ✅ IMPORTANT
+    setUser(null); 
 
     navigate("/login");
   };
@@ -52,7 +52,7 @@ export default function Navbar() {
     };
 
     window.addEventListener("cartUpdated", updateCart);
-    window.addEventListener("storage", updateUser); // ✅ login/logout sync
+    window.addEventListener("storage", updateUser);
 
     return () => {
       window.removeEventListener("cartUpdated", updateCart);
@@ -107,13 +107,18 @@ export default function Navbar() {
 
             <div className="h-6 w-px bg-gray-200 mx-2" />
 
-            {/* ✅ CLEAN USER LOGIC */}
+            {/* USER LOGIC */}
             {user ? (
               <div className="flex items-center space-x-3">
                 <img
-                  src={user.profileImage}
+                  src={
+                    user.profileImage?.startsWith("http")
+                      ? user.profileImage
+                      : `http://localhost:5000/uploads/${user.profileImage}`
+                  }
                   alt="user"
-                  className="w-9 h-9 rounded-full border"
+                  className="w-9 h-9 rounded-full border object-cover"
+                  onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=User&background=6366f1&color=fff"; }}
                 />
                 <button
                   onClick={handleLogout}
