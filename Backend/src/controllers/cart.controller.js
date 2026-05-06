@@ -1,7 +1,7 @@
 const Cart = require("../models/cart.model");
 const Product = require("../models/product.model");
 
-// ➕ ADD TO CART
+//  ADD TO CART
 exports.addToCart = async (req, res) => {
   try {
     const userId = req.userId;
@@ -51,7 +51,7 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-// 📥 GET CART
+//  GET CART
 exports.getCart = async (req, res) => {
   try {
     const userId = req.userId;
@@ -69,7 +69,7 @@ exports.getCart = async (req, res) => {
   }
 };
 
-// ➕ INCREASE
+//  INCREASE QUANTITY
 exports.increaseQty = async (req, res) => {
   const userId = req.userId;
   const { productId } = req.body;
@@ -86,7 +86,7 @@ exports.increaseQty = async (req, res) => {
   res.json(cart);
 };
 
-// ➖ DECREASE
+//  DECREASE QUANTITY
 exports.decreaseQty = async (req, res) => {
   const userId = req.userId;
   const { productId } = req.body;
@@ -105,7 +105,7 @@ exports.decreaseQty = async (req, res) => {
   res.json(cart);
 };
 
-// ❌ REMOVE
+//  REMOVE ITEM
 exports.removeItem = async (req, res) => {
   const userId = req.userId;
   const { productId } = req.body;
@@ -118,4 +118,22 @@ exports.removeItem = async (req, res) => {
 
   await cart.save();
   res.json(cart);
+};
+//  CLEAR CART
+exports.clearCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(200).json({ message: "Cart already empty" });
+    }
+
+    cart.products = [];
+    await cart.save();
+
+    res.status(200).json({ message: "Cart cleared" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

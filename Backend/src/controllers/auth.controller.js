@@ -5,6 +5,7 @@ const  { OAuth2Client } = require("google-auth-library");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+//  GOOGLE LOGIN
 exports.googleLogin = async (req, res) => {
   try {
     const { credential } = req.body;
@@ -49,7 +50,9 @@ exports.googleLogin = async (req, res) => {
     console.log("Google Error:", error);
     res.status(500).json({ message: "Google login failed" });
   }
-};exports.registerUser = async (req, res) => {
+};
+//Regiter user
+exports.registerUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
         const profileImage = req.file ? req.file.filename : "default-profile.png";
@@ -86,6 +89,7 @@ exports.googleLogin = async (req, res) => {
     }
 };
 
+// Update user profile
 exports.updateUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -108,6 +112,7 @@ exports.updateUser = async (req, res) => {
     }
 };
 
+// Login user
 exports.loginUser =async(req,res)=>{
     try {
         const {email,password} = req.body;
@@ -115,17 +120,20 @@ exports.loginUser =async(req,res)=>{
         if(!user){
             return res.status(404).json({ message: "User not found" });
         }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if(!isPasswordValid){
-            return res.status(401).json({ message: "Invalid password" });
+        //
+        if (user.isGoogleUser || !user.password) {
+        return res.status(400).json({ message: "Google se login karo" });
         }
-        if (!user.password) {
-  return res.status(400).json({ message: "Use Google login" });
-}
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid password" });
+        }
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
-        console.log("JWT SECRET 👉", process.env.JWT_SECRET);
         res.status(200).json({ message: "User logged in successfully!", user, token });
-    } catch (error) {
+        } 
+    catch (error) 
+    {
         res.status(500).json({ message: error.message });
     }
 }

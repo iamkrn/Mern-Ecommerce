@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const orderController = require("../controllers/order.controller");
+const authMiddleware = require("../middlewares/auth.middleware");
 
 
 router.post("/create", orderController.createOrder);
 router.get("/", orderController.getOrders);
+router.post("/create-after-payment", authMiddleware, orderController.createOrderAfterPayment);
+
 
 module.exports = router;
